@@ -1,4 +1,3 @@
-// users.js
 const axios = require('axios');
 
 const getUsers = async () => {
