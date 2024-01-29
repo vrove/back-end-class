@@ -12,7 +12,7 @@ const server = http.createServer(async (req, res) => {
         res.write(JSON.stringify({
             'status': 'success',
             'message': 'response success',
-            'description': 'Exercise #03',
+            'description': 'Exercise #02',
             date: moment().format('YYYY-MM-DDTHH:mm:ssZ'),
             data: JSON.stringify(members)
         }));
