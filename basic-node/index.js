@@ -14,9 +14,9 @@ const server = http.createServer(async (req, res) => {
             'message': 'response success',
             'description': 'Exercise #03',
             date: moment().format('YYYY-MM-DDTHH:mm:ssZ'),
+            data: JSON.stringify(members)
         }));
-    } else if (url === '/members') {
-        res.write(JSON.stringify(members));
+   
     } else if (url === '/users') {
         const usersData = await getUsers();
         res.write(JSON.stringify(usersData));
