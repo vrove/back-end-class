@@ -17,10 +17,10 @@ app.get('/users', (req, res) => {
 })
 
 app.get('/users/:name', (req, res) => {
-    const user = getUsers.find(user => user.name === req.params.name)
-    if (user) {
+    const user = getUsers.find(user => user.name.toLowerCase() === req.params.name.toLowerCase())
+    if(user){
         res.json(user)
-    } else {
+    }else {
         res.status(404).json({
             message: "Data user tidak ditemukan"
         })
