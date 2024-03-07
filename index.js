@@ -80,7 +80,7 @@ app.post("/students", async (req, res) => {
                 message: "data berhasil dimasukan"
             })
         }
-    } catch (err) {
+    }catch(err){
       console.error(err);
       res.status(500).send("Internal Server Error");
     }
