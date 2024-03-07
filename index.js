@@ -66,13 +66,20 @@ app.get('/students', async (req, res) => {
 app.post("/students", async (req, res) => {
     const { name, address } = req.body
     try {
-      const result = await db.query(
-        `INSERT into students (name, address) values ('${name}', '${address}')`
-      );
-      res.status(200).json({
-        status: "success",
-        message: "data berhasil dimasukan",
-      });
+        if(!name || !address){
+            res.status(400).json({
+                status: "error",
+                message: "name dan address harus diisi"
+            })
+        }else if(name.length > 2 || address.length > 2){
+            const result = await db.query(
+                `INSERT into students (name, address) values ('${name}', '${address}')`
+            )
+            res.status(200).json({
+                status: "success",
+                message: "data berhasil dimasukan"
+            })
+        }
     } catch (err) {
       console.error(err);
       res.status(500).send("Internal Server Error");
@@ -83,16 +90,23 @@ app.post("/students", async (req, res) => {
 app.put("/students/:id", async (req, res) => {
     const { name, address } = req.body
     try{
-        const result = await db.query(
-            `UPDATE students SET name = '${name}', address = '${address}' WHERE id = ${req.params.id}`
-        )
-        res.status(200).json({
-            status:"success",
-            message: `data dengan id ${req.params.id} berhasil diubah`
-        })
+        if(!name || !address){
+            res.status(400).json({
+                status: "error",
+                message: "name dan address harus diisi"
+            })
+        }else if(name.length > 2 || address.length > 2){
+            const result = await db.query(
+                `UPDATE students SET name = '${name}', address = '${address}' WHERE id = ${req.params.id}`
+            )
+            res.status(200).json({
+                status: "success",
+                message: `data dengan id ${req.params.id} berhasil diubah`
+            })
+        }
     }catch(err){
         console.log(err)
-        res.status(500).send("Internal Server WEwrror")
+        res.status(500).send("Internal Server Error")
     }
 })
 
