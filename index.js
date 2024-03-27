@@ -1,3 +1,5 @@
+const { PrismaClient } = require('@prisma/client')
+
 const express = require('express')
 const app = express()
 const morgan = require('morgan')
@@ -11,6 +13,7 @@ const db = require('./db.js')
 
 const hostname = '127.0.0.1'
 const port = 3000
+const prisma = new PrismaClient()
 
 //M7. cors
 app.use(cors(
@@ -51,18 +54,18 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'))
 })
 
-// Exe7. Get All Students
+// Exe8. Get All Students with Prisma
 app.get('/students', async (req, res) => {
     try {
-      const result = await db.query('SELECT * FROM public.students');
-      res.json(result.rows);
+      const allStudent = await prisma.students.findMany();
+      res.json(allStudent);
     } catch (err) {
       console.error(err);
       res.status(500).send('Internal Server Error');
     }
 });
 
-// Exe7. Add Student
+// Exe8. Add Student with Prisma
 app.post("/students", async (req, res) => {
     const { name, address } = req.body
     try {
@@ -72,36 +75,47 @@ app.post("/students", async (req, res) => {
                 message: "name dan address harus diisi"
             })
         }else if(name.length > 2 || address.length > 2){
-            const result = await db.query(
-                `INSERT into students (name, address) values ('${name}', '${address}')`
+            const insertStudent = await prisma.students.create({
+                data: {
+                    name: name,
+                    address: address
+                }
+            }
             )
             res.status(200).json({
                 status: "success",
                 message: "data berhasil dimasukan"
             })
         }
-    } catch (err) {
+    }catch(err){
       console.error(err);
       res.status(500).send("Internal Server Error");
     }
 })
 
-// Exe7. Update Student by ID
+// Exe8. Update Student by ID with Prisma
 app.put("/students/:id", async (req, res) => {
     const { name, address } = req.body
+    const idStudent = parseInt(req.params.id)
     try{
         if(!name || !address){
             res.status(400).json({
                 status: "error",
                 message: "name dan address harus diisi"
             })
-        }else if(name.length > 2 || address.length > 2){
-            const result = await db.query(
-                `UPDATE students SET name = '${name}', address = '${address}' WHERE id = ${req.params.id}`
-            )
+        }else if(name.length > 1 || address.length > 1){
+            const updateStudent = await prisma.students.update({
+                where: {
+                    id: idStudent
+                },
+                data: {
+                    name: name,
+                    address: address
+                }
+            })
             res.status(200).json({
                 status: "success",
-                message: `data dengan id ${req.params.id} berhasil diubah`
+                message: `data dengan id ${idStudent} berhasil diubah`
             })
         }
     }catch(err){
@@ -110,11 +124,15 @@ app.put("/students/:id", async (req, res) => {
     }
 })
 
-// Exe7. Delete Student by ID
+// Exe8. Delete Student by ID with Prisma
 app.delete("/students/:id", async (req, res) => {
+    const idStudent = parseInt(req.params.id)
     try{
-        const result = await db.query(
-            `DELETE FROM students WHERE id = ${req.params.id}`
+        const result = await prisma.students.delete({
+            where: {
+                id: idStudent
+            }
+        }
         )
         res.status(200).json({
             status: "success",
@@ -126,17 +144,20 @@ app.delete("/students/:id", async (req, res) => {
     }
 })
 
-// Exe7. Get student by ID
+// Exe8. Get student by ID with Prisma
 app.get("/students/:id", async (req, res) => {
+    const idStudent = parseInt(req.params.id)
     try{
-        const result = await db.query(
-            `SELECT * FROM students WHERE id = ${req.params.id}`
-        )
-        if(result.rows.length > 0){
+        const result = await prisma.students.findMany({
+            where: {
+                id: idStudent
+            }
+        })
+        if(result.length > 0){
             res.status(200).json({
-                data: result.rows
+                data: result
             })
-        }else if(result.rows.length == 0){
+        }else{
             res.status(404).json({
                 message: `data dengan id ${req.params.id} tidak ditemukan`
             })
